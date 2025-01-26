@@ -1,0 +1,1503 @@
+local Player = game.Players.LocalPlayer
+local Mouse = Player:GetMouse()
+
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local CoreGuiService = game:GetService("CoreGui")
+local RunService = game:GetService("RunService")
+local TextService = game:GetService("TextService")
+
+local TweenTime = 0.1
+local Level = 1
+
+local GlobalTweenInfo = TweenInfo.new(TweenTime)
+local AlteredTweenInfo = TweenInfo.new(TweenTime, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+
+local DropShadowID = "rbxassetid://297774371"
+local DropShadowTransparency = 0.3
+
+local IconLibraryID = "rbxassetid://3926305904"
+local IconLibraryID2 = "rbxassetid://3926307971"
+
+local MainFont = Enum.Font.Gotham
+
+local function GetXY(GuiObject)
+	local X, Y = Mouse.X - GuiObject.AbsolutePosition.X, Mouse.Y - GuiObject.AbsolutePosition.Y
+	local MaxX, MaxY = GuiObject.AbsoluteSize.X, GuiObject.AbsoluteSize.Y
+	X, Y = math.clamp(X, 0, MaxX), math.clamp(Y, 0, MaxY)
+	return X, Y, X/MaxX, Y/MaxY
+end
+
+local function TitleIcon(ButtonOrNot)
+	local NewTitleIcon = Instance.new(ButtonOrNot and "ImageButton" or "ImageLabel")
+	NewTitleIcon.Name = "TitleIcon"
+	NewTitleIcon.BackgroundTransparency = 1
+	NewTitleIcon.Image = IconLibraryID
+	NewTitleIcon.ImageRectOffset = Vector2.new(524, 764)
+	NewTitleIcon.ImageRectSize = Vector2.new(36, 36)
+	NewTitleIcon.Size = UDim2.new(0,14,0,14)
+	NewTitleIcon.Position = UDim2.new(1,-17,0,3)
+	NewTitleIcon.Rotation = 180
+	NewTitleIcon.ZIndex = Level
+	return NewTitleIcon
+end
+
+local function TickIcon(ButtonOrNot)
+	local NewTickIcon = Instance.new(ButtonOrNot and "ImageButton" or "ImageLabel")
+	NewTickIcon.Name = "TickIcon"
+	NewTickIcon.BackgroundTransparency = 1
+	NewTickIcon.Image = "rbxassetid://3926305904"
+	NewTickIcon.ImageRectOffset = Vector2.new(312,4)
+	NewTickIcon.ImageRectSize = Vector2.new(24,24)
+	NewTickIcon.Size = UDim2.new(1,-6,1,-6)
+	NewTickIcon.Position = UDim2.new(0,3,0,3)
+	NewTickIcon.ZIndex = Level
+	return NewTickIcon
+end
+
+local function DropdownIcon(ButtonOrNot)
+	local NewDropdownIcon = Instance.new(ButtonOrNot and "ImageButton" or "ImageLabel")
+	NewDropdownIcon.Name = "DropdownIcon"
+	NewDropdownIcon.BackgroundTransparency = 1
+	NewDropdownIcon.Image = IconLibraryID2
+	NewDropdownIcon.ImageRectOffset = Vector2.new(324,364)
+	NewDropdownIcon.ImageRectSize = Vector2.new(36,36)
+	NewDropdownIcon.Size = UDim2.new(0,16,0,16)
+	NewDropdownIcon.Position = UDim2.new(1,-18,0,2)
+	NewDropdownIcon.ZIndex = Level
+	return NewDropdownIcon
+end
+
+local function SearchIcon(ButtonOrNot)
+	local NewSearchIcon = Instance.new(ButtonOrNot and "ImageButton" or "ImageLabel")
+	NewSearchIcon.Name = "SearchIcon"
+	NewSearchIcon.BackgroundTransparency = 1
+	NewSearchIcon.Image = IconLibraryID
+	NewSearchIcon.ImageRectOffset = Vector2.new(964,324)
+	NewSearchIcon.ImageRectSize = Vector2.new(36,36)
+	NewSearchIcon.Size = UDim2.new(0,16,0,16)
+	NewSearchIcon.Position = UDim2.new(0,2,0,2)
+	NewSearchIcon.ZIndex = Level
+	return NewSearchIcon
+end
+
+local function RoundBox(CornerRadius, ButtonOrNot)
+	local NewRoundBox = Instance.new(ButtonOrNot and "ImageButton" or "ImageLabel")
+	NewRoundBox.BackgroundTransparency = 1
+	NewRoundBox.Image = "rbxassetid://3570695787"
+	NewRoundBox.SliceCenter = Rect.new(100,100,100,100)
+	NewRoundBox.SliceScale = math.clamp((CornerRadius or 5) * 0.01, 0.01, 1)
+	NewRoundBox.ScaleType = Enum.ScaleType.Slice
+	NewRoundBox.ZIndex = Level
+	return NewRoundBox
+end
+
+local function DropShadow()
+	local NewDropShadow = Instance.new("ImageLabel")
+	NewDropShadow.Name = "DropShadow"
+	NewDropShadow.BackgroundTransparency = 1
+	NewDropShadow.Image = DropShadowID
+	NewDropShadow.ImageTransparency = DropShadowTransparency
+	NewDropShadow.Size = UDim2.new(1,0,1,0)
+	NewDropShadow.ZIndex = Level
+	return NewDropShadow
+end
+
+local function Frame()
+	local NewFrame = Instance.new("Frame")
+	NewFrame.BorderSizePixel = 0
+	NewFrame.ZIndex = Level
+	return NewFrame
+end
+
+local function ScrollingFrame()
+	local NewScrollingFrame = Instance.new("ScrollingFrame")
+	NewScrollingFrame.BackgroundTransparency = 1
+	NewScrollingFrame.BorderSizePixel = 0
+	NewScrollingFrame.ScrollBarThickness = 0
+	NewScrollingFrame.ZIndex = Level
+	return NewScrollingFrame
+end
+
+local function TextButton(Text, Size)
+	local NewTextButton = Instance.new("TextButton")
+	NewTextButton.Text = Text
+	NewTextButton.AutoButtonColor = false
+	NewTextButton.Font = MainFont
+	NewTextButton.TextColor3 = Color3.fromRGB(255,255,255)
+	NewTextButton.BackgroundTransparency = 1
+	NewTextButton.TextSize = Size or 12
+	NewTextButton.Size = UDim2.new(1,0,1,0)
+	NewTextButton.ZIndex = Level
+	return NewTextButton
+end
+
+local function TextBox(Text, Size)
+	local NewTextBox = Instance.new("TextBox")
+	NewTextBox.Text = Text
+	NewTextBox.Font = MainFont
+	NewTextBox.TextColor3 = Color3.fromRGB(255,255,255)
+	NewTextBox.BackgroundTransparency = 1
+	NewTextBox.TextSize = Size or 12
+	NewTextBox.Size = UDim2.new(1,0,1,0)
+	NewTextBox.ZIndex = Level
+	return NewTextBox
+end
+
+local function TextLabel(Text, Size)
+	local NewTextLabel = Instance.new("TextLabel")
+	NewTextLabel.Text = Text
+	NewTextLabel.Font = MainFont
+	NewTextLabel.TextColor3 = Color3.fromRGB(255,255,255)
+	NewTextLabel.BackgroundTransparency = 1
+	NewTextLabel.TextSize = Size or 12
+	NewTextLabel.Size = UDim2.new(1,0,1,0)
+	NewTextLabel.ZIndex = Level
+	return NewTextLabel
+end
+
+local function Tween(GuiObject, Dictionary)
+	local TweenBase = TweenService:Create(GuiObject, GlobalTweenInfo, Dictionary)
+	TweenBase:Play()
+	return TweenBase
+end
+
+local UILibrary = {}
+
+function UILibrary.Load(GUITitle)
+	local TargetedParent = RunService:IsStudio() and Player:WaitForChild("PlayerGui") or CoreGuiService
+	
+	local FindOldInstance = TargetedParent:FindFirstChild(GUITitle)
+	
+	if FindOldInstance then
+		FindOldInstance:Destroy()
+	end
+	
+	local NewInstance, ContainerFrame, ContainerShadow, MainFrame
+	
+	NewInstance = Instance.new("ScreenGui")
+	NewInstance.Name = GUITitle
+	NewInstance.Parent = TargetedParent
+	
+	ContainerFrame = Frame()
+	ContainerFrame.Name = "ContainerFrame"
+	ContainerFrame.Size = UDim2.new(0,500,0,300)
+	ContainerFrame.Position = UDim2.new(0.5,-250,0.5,-150)
+	ContainerFrame.BackgroundTransparency = 1
+	ContainerFrame.Parent = NewInstance
+	
+	ContainerShadow = DropShadow()
+	ContainerShadow.Name = "Shadow"
+	ContainerShadow.Parent = ContainerFrame
+	
+	Level += 1
+	
+	MainFrame = RoundBox(5)
+	MainFrame.ClipsDescendants = true
+	MainFrame.Name = "MainFrame"
+	MainFrame.Size = UDim2.new(1,-50,1,-30)
+	MainFrame.Position = UDim2.new(0,25,0,15)
+	MainFrame.ImageColor3 = Color3.fromRGB(30,30,30)
+	MainFrame.Parent = ContainerFrame
+	
+	local MenuBar, DisplayFrame, TitleBar
+	
+	MenuBar = ScrollingFrame()
+	MenuBar.Name = "MenuBar"
+	MenuBar.BackgroundTransparency = 0.7
+	MenuBar.BackgroundColor3 = Color3.fromRGB(20,20,20)
+	MenuBar.Size = UDim2.new(0,100,0,235)
+	MenuBar.Position = UDim2.new(0,5,0,30)
+	MenuBar.CanvasSize = UDim2.new(0,0,0,0)
+	MenuBar.Parent = MainFrame
+	
+	DisplayFrame = RoundBox(5)
+	DisplayFrame.Name = "Display"
+	DisplayFrame.ImageColor3 = Color3.fromRGB(20,20,20)
+	DisplayFrame.Size = UDim2.new(1,-115,0,235)
+	DisplayFrame.Position = UDim2.new(0,110,0,30)
+	DisplayFrame.Parent = MainFrame
+	
+	TitleBar = RoundBox(5)
+	TitleBar.Name = "TitleBar"
+	TitleBar.ImageColor3 = Color3.fromRGB(40,40,40)
+	TitleBar.Size = UDim2.new(1,-10,0,20)
+	TitleBar.Position = UDim2.new(0,5,0,5)
+	TitleBar.Parent = MainFrame
+	
+	Level += 1
+	
+	local MinimiseButton, TitleButton
+	local MinimiseToggle = true
+	
+	MinimiseButton = TitleIcon(true)
+	MinimiseButton.Name = "Minimise"
+	MinimiseButton.Parent = TitleBar
+	
+	TitleButton = TextButton(GUITitle, 14)
+	TitleButton.Name = "TitleButton"
+	TitleButton.Size = UDim2.new(1,-20,1,0)
+	TitleButton.Parent = TitleBar
+	
+	MinimiseButton.MouseButton1Down:Connect(function()
+		MinimiseToggle = not MinimiseToggle
+		if not MinimiseToggle then
+			Tween(MainFrame, {Size = UDim2.new(1,-50,0,30)})
+			Tween(MinimiseButton, {Rotation = 0})
+			Tween(ContainerShadow, {ImageTransparency = 1})
+		else
+			Tween(MainFrame, {Size = UDim2.new(1,-50,1,-30)})
+			Tween(MinimiseButton, {Rotation = 180})
+			Tween(ContainerShadow, {ImageTransparency = DropShadowTransparency})
+		end
+	end)
+	
+	TitleButton.MouseButton1Down:Connect(function()
+		local LastMX, LastMY = Mouse.X, Mouse.Y
+		local Move, Kill
+		Move = Mouse.Move:Connect(function()
+			local NewMX, NewMY = Mouse.X, Mouse.Y
+			local DX, DY = NewMX - LastMX, NewMY - LastMY
+			ContainerFrame.Position += UDim2.new(0,DX,0,DY)
+			LastMX, LastMY = NewMX, NewMY
+		end)
+		Kill = UserInputService.InputEnded:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 then
+				Move:Disconnect()
+				Kill:Disconnect()
+			end
+		end)
+	end)
+	
+	Level += 1
+	
+	local MenuListLayout
+	
+	MenuListLayout = Instance.new("UIListLayout")
+	MenuListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	MenuListLayout.Padding = UDim.new(0,5)
+	MenuListLayout.Parent = MenuBar
+	
+	local TabCount = 0
+	
+	local TabLibrary = {}
+	
+	function TabLibrary.AddPage(PageTitle, SearchBarIncluded)
+		local SearchBarIncluded = (SearchBarIncluded == nil) and true or SearchBarIncluded
+		
+		local PageContainer = RoundBox(5)
+		PageContainer.Name = PageTitle
+		PageContainer.Size = UDim2.new(1,0,0,20)
+		PageContainer.LayoutOrder = TabCount
+		PageContainer.ImageColor3 = (TabCount == 0) and Color3.fromRGB(50,50,50) or Color3.fromRGB(40,40,40)
+		PageContainer.Parent = MenuBar
+		
+		local PageButton = TextButton(PageTitle, 14)
+		PageButton.Name = PageTitle.."Button"
+		PageButton.TextTransparency = (TabCount == 0) and 0 or 0.5
+		PageButton.Parent = PageContainer
+		
+		PageButton.MouseButton1Down:Connect(function()
+			spawn(function()
+				for _, Button in next, MenuBar:GetChildren() do
+					if Button:IsA("GuiObject") then
+						local IsButton = string.find(Button.Name:lower(), PageContainer.Name:lower())
+						local Button2 = Button:FindFirstChild(Button.Name.."Button")
+						Tween(Button, {ImageColor3 = IsButton and Color3.fromRGB(50,50,50) or Color3.fromRGB(40,40,40)})
+						Tween(Button2, {TextTransparency = IsButton and 0 or 0.5})
+					end
+				end
+			end)
+			spawn(function()
+				for _, Display in next, DisplayFrame:GetChildren() do
+					if Display:IsA("GuiObject") then
+						Display.Visible = string.find(Display.Name:lower(), PageContainer.Name:lower())
+					end
+				end
+			end)
+		end)
+		
+		local DisplayPage = ScrollingFrame()
+		DisplayPage.Visible = (TabCount == 0)
+		DisplayPage.Name = PageTitle
+		DisplayPage.Size = UDim2.new(1,0,1,0)
+		DisplayPage.Parent = DisplayFrame
+		
+		TabCount += 1
+		
+		local DisplayList = Instance.new("UIListLayout")
+		DisplayList.SortOrder = Enum.SortOrder.LayoutOrder
+		DisplayList.Padding = UDim.new(0,5)
+		DisplayList.Parent = DisplayPage
+		
+		DisplayList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+			local Y1 = DisplayList.AbsoluteContentSize.Y
+			local Y2 = DisplayPage.AbsoluteWindowSize.Y
+			DisplayPage.CanvasSize = UDim2.new(0,0,(Y1/Y2)+0.05,0)
+		end)
+		
+		local DisplayPadding = Instance.new("UIPadding")
+		DisplayPadding.PaddingBottom = UDim.new(0,5)
+		DisplayPadding.PaddingTop = UDim.new(0,5)
+		DisplayPadding.PaddingLeft = UDim.new(0,5)
+		DisplayPadding.PaddingRight = UDim.new(0,5)
+		DisplayPadding.Parent = DisplayPage
+		
+		if SearchBarIncluded then
+			local SearchBarContainer = RoundBox(5)
+			SearchBarContainer.Name = "SearchBar"
+			SearchBarContainer.ImageColor3 = Color3.fromRGB(35,35,35)
+			SearchBarContainer.Size = UDim2.new(1,0,0,20)
+			SearchBarContainer.Parent = DisplayPage
+			
+			local SearchBox = TextBox("Search...")
+			SearchBox.Name = "SearchInput"
+			SearchBox.Position = UDim2.new(0,20,0,0)
+			SearchBox.Size = UDim2.new(1,-20,1,0)
+			SearchBox.TextTransparency = 0.5
+			SearchBox.TextXAlignment = Enum.TextXAlignment.Left
+			SearchBox.Parent = SearchBarContainer
+			
+			local SearchIcon = SearchIcon()
+			SearchIcon.Parent = SearchBarContainer
+			
+			SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
+				local NewValue = SearchBox.Text
+				
+				for _, Element in next, DisplayPage:GetChildren() do
+					if Element:IsA("Frame") then
+						if not string.find(Element.Name:lower(), "label") then
+							if string.find(Element.Name:lower(), NewValue:lower()) then
+								Element.Visible = true
+							else
+								Element.Visible = false
+							end
+						end
+					end
+				end
+			end)
+		end
+		
+		local PageLibrary = {}
+		
+		function PageLibrary.AddButton(Text, Callback, Parent, Underline)
+			local ButtonContainer = Frame()
+			ButtonContainer.Name = Text.."BUTTON"
+			ButtonContainer.Size = UDim2.new(1,0,0,20)
+			ButtonContainer.BackgroundTransparency = 1
+			ButtonContainer.Parent = Parent or DisplayPage
+			
+			local ButtonForeground = RoundBox(5)
+			ButtonForeground.Name = "ButtonForeground"
+			ButtonForeground.Size = UDim2.new(1,0,1,0)
+			ButtonForeground.ImageColor3 = Color3.fromRGB(35,35,35)
+			ButtonForeground.Parent = ButtonContainer
+			
+			if Underline then
+				local TextSize = TextService:GetTextSize(Text, 12, Enum.Font.Gotham, Vector2.new(0,0))
+			
+				local BottomEffect = Frame()
+				BottomEffect.Size = UDim2.new(0,TextSize.X,0,1)
+				BottomEffect.Position = UDim2.new(0.5,(-TextSize.X/2)-1,1,-1)
+				BottomEffect.BackgroundColor3 = Color3.fromRGB(255,255,255)
+				BottomEffect.BackgroundTransparency = 0.5
+				BottomEffect.Parent = ButtonForeground
+			end
+			
+			local HiddenButton = TextButton(Text, 12)
+			HiddenButton.Parent = ButtonForeground
+			
+			HiddenButton.MouseButton1Down:Connect(function()
+				Callback()
+				Tween(ButtonForeground, {ImageColor3 = Color3.fromRGB(45,45,45)})
+				Tween(HiddenButton, {TextTransparency = 0.5})
+				wait(TweenTime)
+				Tween(ButtonForeground, {ImageColor3 = Color3.fromRGB(35,35,35)})
+				Tween(HiddenButton, {TextTransparency = 0})
+			end)
+		end
+		
+		function PageLibrary.AddLabel(Text)
+			local LabelContainer = Frame()
+			LabelContainer.Name = Text.."LABEL"
+			LabelContainer.Size = UDim2.new(1,0,0,20)
+			LabelContainer.BackgroundTransparency = 1
+			LabelContainer.Parent = DisplayPage
+			
+			local LabelForeground = RoundBox(5)
+			LabelForeground.Name = "LabelForeground"
+			LabelForeground.ImageColor3 = Color3.fromRGB(45,45,45)
+			LabelForeground.Size = UDim2.new(1,0,1,0)
+			LabelForeground.Parent = LabelContainer
+			
+			local HiddenLabel = TextLabel(Text, 12)
+			HiddenLabel.Parent = LabelForeground
+		end
+		
+		function PageLibrary.AddDropdown(Text, ConfigurationArray, Callback)
+			local DropdownArray = ConfigurationArray or {}
+			
+			local DropdownToggle = false
+			
+			local DropdownContainer = Frame()
+			DropdownContainer.Size = UDim2.new(1,0,0,20)
+			DropdownContainer.Name = Text.."DROPDOWN"
+			DropdownContainer.BackgroundTransparency = 1
+			DropdownContainer.Parent = DisplayPage
+			
+			local DropdownForeground = RoundBox(5)
+			DropdownForeground.ClipsDescendants = true
+			DropdownForeground.ImageColor3 = Color3.fromRGB(35,35,35)
+			DropdownForeground.Size = UDim2.new(1,0,1,0)
+			DropdownForeground.Parent = DropdownContainer
+			
+			local DropdownExpander = DropdownIcon(true)
+			DropdownExpander.Parent = DropdownForeground
+			
+			local DropdownLabel = TextLabel(Text, 12)
+			DropdownLabel.Size = UDim2.new(1,0,0,20)
+			DropdownLabel.Parent = DropdownForeground
+			
+			local DropdownFrame = Frame()
+			DropdownFrame.Position = UDim2.new(0,0,0,20)
+			DropdownFrame.BackgroundTransparency = 1
+			DropdownFrame.Size = UDim2.new(1,0,0,#DropdownArray*20)
+			DropdownFrame.Parent = DropdownForeground
+			
+			local DropdownList = Instance.new("UIListLayout")
+			DropdownList.Parent = DropdownFrame
+			
+			for OptionIndex, Option in next, DropdownArray do
+				PageLibrary.AddButton(Option, function()
+					Callback(Option)
+					DropdownLabel.Text = Text..": "..Option
+				end, DropdownFrame, OptionIndex < #DropdownArray)
+			end
+			
+			DropdownExpander.MouseButton1Down:Connect(function()
+				DropdownToggle = not DropdownToggle
+				Tween(DropdownContainer, {Size = DropdownToggle and UDim2.new(1,0,0,20+(#DropdownArray*20)) or UDim2.new(1,0,0,20)})
+				Tween(DropdownExpander, {Rotation = DropdownToggle and 135 or 0})
+			end)
+		end
+		
+		function PageLibrary.AddColourPicker(Text, DefaultColour, Callback)
+			local DefaultColour = DefaultColour or Color3.fromRGB(255,255,255)
+			
+			local ColourDictionary = {
+				white = Color3.fromRGB(255,255,255),
+				black = Color3.fromRGB(0,0,0),
+				red = Color3.fromRGB(255,0,0),
+				green = Color3.fromRGB(0,255,0),
+				blue = Color3.fromRGB(0,0,255)
+			}
+			
+			if typeof(DefaultColour) == "table" then
+				DefaultColour = Color3.fromRGB(DefaultColour[1] or 255, DefaultColour[2] or 255, DefaultColour[3] or 255)
+			elseif typeof(DefaultColour) == "string" then
+				DefaultColour = ColourDictionary[DefaultColour:lower()] or ColourDictionary["white"]
+			end
+			
+			local PickerContainer = Frame()
+			PickerContainer.ClipsDescendants = true
+			PickerContainer.Size = UDim2.new(1,0,0,20)
+			PickerContainer.Name = Text.."COLOURPICKER"
+			PickerContainer.BackgroundTransparency = 1
+			PickerContainer.Parent = DisplayPage
+			
+			local ColourTracker = Instance.new("Color3Value")
+			ColourTracker.Value = DefaultColour
+			ColourTracker.Parent = PickerContainer
+			
+			local PickerLeftSide, PickerRightSide, PickerFrame = RoundBox(5), RoundBox(5), RoundBox(5)
+			
+			PickerLeftSide.Size = UDim2.new(1,-22,1,0)
+			PickerLeftSide.ImageColor3 = Color3.fromRGB(35,35,35)
+			PickerLeftSide.Parent = PickerContainer
+			
+			PickerRightSide.Size = UDim2.new(0,20,1,0)
+			PickerRightSide.Position = UDim2.new(1,-20,0,0)
+			PickerRightSide.ImageColor3 = DefaultColour
+			PickerRightSide.Parent = PickerContainer
+			
+			PickerFrame.ImageColor3 = Color3.fromRGB(35,35,35)
+			PickerFrame.Size = UDim2.new(1,-22,0,60)
+			PickerFrame.Position = UDim2.new(0,0,0,20)
+			PickerFrame.Parent = PickerContainer
+			
+			local PickerList = Instance.new("UIListLayout")
+			PickerList.SortOrder = Enum.SortOrder.LayoutOrder
+			PickerList.Parent = PickerFrame
+			
+			local RedPicker = PageLibrary.AddSlider("R", {Min = 0, Max = 255, Def = ColourTracker.Value.R * 255}, function(Value)
+				ColourTracker.Value = Color3.fromRGB(Value, ColourTracker.Value.G * 255, ColourTracker.Value.B * 255)
+				Callback(ColourTracker.Value)
+			end, PickerFrame)
+			
+			local BluePicker = PageLibrary.AddSlider("G", {Min = 0, Max = 255, Def = ColourTracker.Value.G * 255}, function(Value)
+				ColourTracker.Value = Color3.fromRGB(ColourTracker.Value.R * 255, Value, ColourTracker.Value.B * 255)
+				Callback(ColourTracker.Value)
+			end, PickerFrame)
+			
+			local GreenPicker = PageLibrary.AddSlider("B", {Min = 0, Max = 255, Def = ColourTracker.Value.B * 255}, function(Value)
+				ColourTracker.Value = Color3.fromRGB(ColourTracker.Value.R * 255, ColourTracker.Value.G * 255, Value)
+				Callback(ColourTracker.Value)
+			end, PickerFrame)
+			
+			local EffectLeft, EffectRight = Frame(), Frame()
+			
+			EffectLeft.BackgroundColor3 = Color3.fromRGB(35,35,35)
+			EffectLeft.Position = UDim2.new(1,-5,0,0)
+			EffectLeft.Size = UDim2.new(0,5,1,0)
+			EffectLeft.Parent = PickerLeftSide
+			
+			EffectRight.BackgroundColor3 = DefaultColour
+			EffectRight.Size = UDim2.new(0,5,1,0)
+			EffectRight.Parent = PickerRightSide
+			
+			local PickerLabel = TextLabel(Text, 12)
+			PickerLabel.Size = UDim2.new(1,0,0,20)
+			PickerLabel.Parent = PickerLeftSide
+			
+			ColourTracker:GetPropertyChangedSignal("Value"):Connect(function()
+				local NewValue = ColourTracker.Value
+				EffectRight.BackgroundColor3 = NewValue
+				PickerRightSide.ImageColor3 = NewValue
+			end)
+			
+			local PickerToggle = false
+			
+			local PickerButton = TextButton("")
+			PickerButton.Parent = PickerRightSide
+			
+			PickerButton.MouseButton1Down:Connect(function()
+				PickerToggle = not PickerToggle
+				Tween(PickerContainer, {Size = PickerToggle and UDim2.new(1,0,0,80) or UDim2.new(1,0,0,20)})
+			end)
+		end
+		
+		function PageLibrary.AddSlider(Text, ConfigurationDictionary, Callback, Parent)
+			local Configuration = ConfigurationDictionary
+			local Minimum = Configuration.Minimum or Configuration.minimum or Configuration.Min or Configuration.min
+			local Maximum = Configuration.Maximum or Configuration.maximum or Configuration.Max or Configuration.max
+			local Default = Configuration.Default or Configuration.default or Configuration.Def or Configuration.def
+			
+			if Minimum > Maximum then
+				local StoreValue = Minimum
+				Minimum = Maximum
+				Maximum = StoreValue
+			end
+			
+			Default = math.clamp(Default, Minimum, Maximum)
+			
+			local DefaultScale = Default/Maximum
+			
+			local SliderContainer = Frame()
+			SliderContainer.Name = Text.."SLIDER"
+			SliderContainer.Size = UDim2.new(1,0,0,20)
+			SliderContainer.BackgroundTransparency = 1
+			SliderContainer.Parent = Parent or DisplayPage
+			
+			local SliderForeground = RoundBox(5)
+			SliderForeground.Name = "SliderForeground"
+			SliderForeground.ImageColor3 = Color3.fromRGB(35,35,35)
+			SliderForeground.Size = UDim2.new(1,0,1,0)
+			SliderForeground.Parent = SliderContainer
+			
+			local SliderButton = TextButton(Text..": "..Default)
+			SliderButton.Size = UDim2.new(1,0,1,0)
+			SliderButton.ZIndex = 6
+			SliderButton.Parent = SliderForeground
+			
+			local SliderFill = RoundBox(5)
+			SliderFill.Size = UDim2.new(DefaultScale,0,1,0)
+			SliderFill.ImageColor3 = Color3.fromRGB(70,70,70)
+			SliderFill.ZIndex = 5
+			SliderFill.ImageTransparency = 0.7
+			SliderFill.Parent = SliderButton
+			
+			SliderButton.MouseButton1Down:Connect(function()
+				Tween(SliderFill, {ImageTransparency = 0.5})
+				local X, Y, XScale, YScale = GetXY(SliderButton)
+				local Value = math.floor(Minimum + ((Maximum - Minimum) * XScale))
+				Callback(Value)
+				SliderButton.Text = Text..": "..tostring(Value)
+				local TargetSize = UDim2.new(XScale,0,1,0)
+				Tween(SliderFill, {Size = TargetSize})
+				local SliderMove, SliderKill
+				SliderMove = Mouse.Move:Connect(function()
+					Tween(SliderFill, {ImageTransparency = 0.5})
+					local X, Y, XScale, YScale = GetXY(SliderButton)
+					local Value = math.floor(Minimum + ((Maximum - Minimum) * XScale))
+					Callback(Value)
+					SliderButton.Text = Text..": "..tostring(Value)
+					local TargetSize = UDim2.new(XScale,0,1,0)
+					Tween(SliderFill, {Size = TargetSize})
+				end)
+				SliderKill = UserInputService.InputEnded:Connect(function(UserInput)
+					if UserInput.UserInputType == Enum.UserInputType.MouseButton1 then
+						Tween(SliderFill, {ImageTransparency = 0.7})
+						SliderMove:Disconnect()
+						SliderKill:Disconnect()
+					end
+				end)
+			end)
+		end
+		
+		function PageLibrary.AddToggle(Text, Default, Callback)
+			local ThisToggle = Default or false
+			
+			local ToggleContainer = Frame()
+			ToggleContainer.Name = Text.."TOGGLE"
+			ToggleContainer.Size = UDim2.new(1,0,0,20)
+			ToggleContainer.BackgroundTransparency = 1
+			ToggleContainer.Parent = DisplayPage
+			
+			local ToggleLeftSide, ToggleRightSide, EffectFrame, RightTick = RoundBox(5), RoundBox(5), Frame(), TickIcon()
+			local FlatLeft, FlatRight = Frame(), Frame()
+			
+			ToggleLeftSide.Size = UDim2.new(1,-22,1,0)
+			ToggleLeftSide.ImageColor3 = Color3.fromRGB(35,35,35)
+			ToggleLeftSide.Parent = ToggleContainer
+			
+			ToggleRightSide.Position = UDim2.new(1,-20,0,0)
+			ToggleRightSide.Size = UDim2.new(0,20,1,0)
+			ToggleRightSide.ImageColor3 = Color3.fromRGB(45,45,45)
+			ToggleRightSide.Parent = ToggleContainer
+			
+			FlatLeft.BackgroundColor3 = Color3.fromRGB(35,35,35)
+			FlatLeft.Size = UDim2.new(0,5,1,0)
+			FlatLeft.Position = UDim2.new(1,-5,0,0)
+			FlatLeft.Parent = ToggleLeftSide
+			
+			FlatRight.BackgroundColor3 = Color3.fromRGB(45,45,45)
+			FlatRight.Size = UDim2.new(0,5,1,0)
+			FlatRight.Parent = ToggleRightSide
+			
+			EffectFrame.BackgroundColor3 = ThisToggle and Color3.fromRGB(0,255,109) or Color3.fromRGB(255,160,160)
+			EffectFrame.Position = UDim2.new(1,-22,0.2,0)
+			EffectFrame.Size = UDim2.new(0,2,0.6,0)
+			EffectFrame.Parent = ToggleContainer
+			
+			RightTick.ImageTransparency = ThisToggle and 0 or 1
+			RightTick.Parent = ToggleRightSide
+			
+			local ToggleButton = TextButton(Text, 12)
+			ToggleButton.Name = "ToggleButton"
+			ToggleButton.Size = UDim2.new(1,0,1,0)
+			ToggleButton.Parent = ToggleLeftSide
+			
+			ToggleButton.MouseButton1Down:Connect(function()
+				ThisToggle = not ThisToggle
+				Tween(EffectFrame, {BackgroundColor3 = ThisToggle and Color3.fromRGB(0,255,109) or Color3.fromRGB(255,160,160)})
+				Tween(RightTick, {ImageTransparency = ThisToggle and 0 or 1})
+				Callback(ThisToggle)
+			end)	
+		end
+		
+		return PageLibrary
+	end
+	
+	return TabLibrary
+end
+
+local Window = UILibrary.Load("Anime Voiceline Gui By Sindosu")
+local JOTARO = Window.AddPage("Jotaro Mode")
+local DIO = Window.AddPage("Dio Mode")
+local KIRA = Window.AddPage("Kira Mode")
+local Diego = Window.AddPage("Diego Brando Mode")
+local Diavolo = Window.AddPage("Diavolo Mode")
+local PUCCI = Window.AddPage("Pucci")
+local GIORNO = Window.AddPage("Giorno Mode")
+local EXTRA = Window.AddPage("Extra Voicelines")
+local MISC = Window.AddPage("Miscs")
+local CREDIT = Window.AddPage("Credits")
+ 
+--//------------------------------------------------------------------------------------------\\--
+TweenService = game:GetService("TweenService")
+OWNER = game:GetService("Players").LocalPlayer
+--//------------------------------------------------------------------------------------------\\--
+local OriginalKeyUpValue = 0
+function StopAudio()
+    game:GetService("ReplicatedStorage"):WaitForChild("MainEvent"):FireServer("BoomboxStop")
+end
+--//------------------------------------------------------------------------------------------\\--
+function stop(ID, Key)
+    local cor = coroutine.wrap(function()
+        wait(OWNER.Character.LowerTorso.BOOMBOXSOUND.TimeLength-0.1)
+        if OWNER.Character.LowerTorso.BOOMBOXSOUND.SoundId == "rbxassetid://"..ID and OriginalKeyUpValue == Key then
+            StopAudio()
+        end
+    end)
+    cor()
+end
+--//------------------------------------------------------------------------------------------\\--
+function Play(ID)
+    if OWNER.Backpack:FindFirstChild("[Boombox]") then
+        local Tool = nil
+        OWNER.Backpack["[Boombox]"].Parent = OWNER.Character
+        game.ReplicatedStorage.MainEvent:FireServer("Boombox", ID)
+        OWNER.Character["[Boombox]"].RequiresHandle = false
+        OWNER.Character["[Boombox]"].Parent = OWNER.Backpack
+        OWNER.PlayerGui.MainScreenGui.BoomboxFrame.Visible = false
+        if Tool ~= true then
+            if Tool then
+                Tool.Parent = OWNER.Character
+            end
+        end
+        OWNER.Character.LowerTorso:WaitForChild("BOOMBOXSOUND")
+            local cor = coroutine.wrap(function()
+                repeat wait() until OWNER.Character.LowerTorso.BOOMBOXSOUND.SoundId == "rbxassetid://"..ID and OWNER.Character.LowerTorso.BOOMBOXSOUND.TimeLength > 0.01
+                OriginalKeyUpValue = OriginalKeyUpValue+1
+                stop(ID, OriginalKeyUpValue)
+            end)
+        cor()
+    end
+end
+--//------------------------------------------------------------------------------------------\\--
+function chat(msg)
+    local A_1 = msg
+    local A_2 = "All"
+    local Event = game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest
+    Event:FireServer(A_1, A_2)
+end
+--//------------------------------------------------------------------------------------------\\--
+function MoveTo(X,Y,Z)
+    OWNER.Character.HumanoidRootPart.CFrame = OWNER.Character.HumanoidRootPart.CFrame*CFrame.new(X,Y,Z)
+end
+--//------------------------------------------------------------------------------------------\\--
+ 
+game.Players.LocalPlayer:GetMouse().KeyDown:connect(function(key)
+    if key == "v" then
+        if Closed == true then
+        Closed = false
+            game.CoreGui["Anime Voiceline Gui"].Enabled = false
+        else
+            Closed = true
+            game.CoreGui["Anime Voiceline Gui"].Enabled = true
+        end
+    elseif key == 'x' then
+        Play(6603980575)
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, -30)
+        TweenService:Create(workspace.CurrentCamera, TweenInfo.new(0.5), {FieldOfView = 85}):Play()
+        TweenService:Create(game:GetService("Lighting").ColorCorrection, TweenInfo.new(0.8), {Saturation = -1}):Play()
+        local blur = Instance.new("BlurEffect", game:GetService("Lighting"))
+        TweenService:Create(blur, TweenInfo.new(0.8), {Size = 10}):Play()
+        wait(0.5)
+        TweenService:Create(workspace.CurrentCamera, TweenInfo.new(0.5), {FieldOfView = 70}):Play()
+        game:GetService("Lighting").ColorCorrection.TintColor = Color3.fromRGB(250, 250, 250)
+        TweenService:Create(blur, TweenInfo.new(0.8), {Size = 0}):Play()
+        wait(0.5)
+        TweenService:Create(game:GetService("Lighting").ColorCorrection, TweenInfo.new(0.8), {Saturation = 0}):Play()
+    end    
+end)
+--//------------------------------------------------------------------------------------------\\-- JOTARO
+ 
+JOTARO.AddLabel("Summon Voiclines")
+JOTARO.AddButton("Star Platinum : OverHeaven",function()
+chat("Star Platinum : OverHeaven")
+Play(5684695930)
+    wait(1)
+end)
+JOTARO.AddButton("Star Platinum, Za Warudo!",function()
+chat("Star Platinum, Za Warudo!")
+Play(5736107502)
+    wait(1)
+end)
+JOTARO.AddButton("Star Platinum!",function()
+chat("Star Platinum!")
+Play(2554017604)
+    wait(1)
+end)
+JOTARO.AddLabel("Jotaro Speaking")
+JOTARO.AddButton("Yare Yare Daze...",function()
+chat("Yare Yare Daze...")
+Play(6670645219)
+    wait(1)
+end)
+JOTARO.AddButton("Yare Yare Daze..",function()
+chat("Yare Yare Daze..")
+Play(8883559770)
+    wait(1)
+end)
+JOTARO.AddButton("Yare Yare...",function()
+chat("Yare Yare...")
+Play(8657023668)
+end)
+JOTARO.AddButton("Hm.",function()
+    chat("Hm.")
+    Play(8404016542)
+end)
+JOTARO.AddButton("Hm. Not bad.",function()
+    chat("Hm. Not bad.")
+    Play(4894428927)
+end)
+JOTARO.AddButton("Hey, what do you mean.",function()
+    chat("Hey, what do you mean.")
+    Play(8322982206)
+end)
+JOTARO.AddButton("What's wrong?",function()
+    chat("What's wrong?")
+    Play(8600140455)
+end)
+JOTARO.AddButton("Nice, Nice..",function()
+    chat("Nice, Nice..")
+    Play(8825592240)
+end)
+JOTARO.AddButton("Ally or enemy? It's your choice.",function()
+    chat("Ally or enemy? It's your choice.")
+    Play(8825179323)
+end)
+JOTARO.AddButton("Why did you just call me Jotaro?",function()
+    chat("Why did you just call me Jotaro?")
+    Play(8322803654)
+end)
+JOTARO.AddButton("Do you want a fight? I'll give you a fight.",function()
+    chat("Do you want a fight? I'll give you a fight.")
+    Play(5111658124)
+end)
+JOTARO.AddButton("Shut up! Don't be such a pain, woman!",function()
+chat("Shut up! Don't be such a pain, woman!")
+Play(6066726827)
+    wait(1)
+end)
+JOTARO.AddButton("Time is now soon to flow...!",function()
+chat("Time is now soon to flow...!")
+Play(6769327870)
+    wait(1)
+end)
+JOTARO.AddButton("DIO!",function()
+chat("DIO!")
+Play(8366433287)
+    wait(1)
+end)
+JOTARO.AddButton("I'll be the judge!",function()
+chat("I'll be the judge!")
+Play(5344619446)
+    wait(1)
+end)
+JOTARO.AddButton("You Will Definitely Pay!",function()
+chat("You Will Definitely Pay!")
+Play(4903895449)
+    wait(1)
+end)
+JOTARO.AddButton("ORA ORA ORA ORA ORA!",function()
+chat("ORA ORA ORA ORA ORA ORA ORA ORAA")
+Play(6678126154)
+    wait(1)
+end)
+JOTARO.AddButton("I Held Back..",function()
+chat("I Held Back..")
+Play(5261021079)
+    wait(1)
+end)
+JOTARO.AddButton("Shut up!",function()
+chat("Shut up!")
+Play(8769065286)
+    wait(1)
+end)
+JOTARO.AddButton("Huh!?!?",function()
+chat("Huh!?!?")
+Play(8366720886)
+    wait(1)
+end)
+--//------------------------------------------------------------------------------------------\\-- DIO
+DIO.AddButton("ZA WARUDO : OVER HEAVEN",function()
+chat("ZA WARUDO : OVER HEAVEN")
+Play(5129686200)
+    wait(1)
+end)
+DIO.AddButton("MUDA MUDA MUDA MUDA MUDA MUDAA",function()
+chat("MUDA MUDA MUDA MUDA MUDA MUDA MUDAA")
+Play(4968518358)
+    wait(1)
+end)
+DIO.AddButton("you dare to resist my reality?!",function()
+chat("You Dare To Resist My Reality?!")
+Play(3516206013)
+    wait(1)
+end)
+DIO.AddButton("This Is Reality!",function()
+chat("This Is Reality!")
+Play(3516209683)
+    wait(1)
+end)
+DIO.AddButton("reality bend to my will",function()
+chat("Reality Bend To My Will.")
+Play(3520725457)
+    wait(1)
+end)
+DIO.AddButton("no one can destroy my reality",function()
+chat("No One Can Destroy My Reality.")
+Play(3520733618)
+    wait(1)
+end)
+DIO.AddButton("this is the path to heaven",function()
+chat("This Is The Path To Heaven.")
+Play(3520741614)
+    wait(1)
+end)
+DIO.AddButton("You Fool!",function()
+chat("You Fool!")
+Play(2554775814)
+    wait(1)
+end)
+DIO.AddButton("This is the end!",function()
+chat("This Is The End!")
+Play(2558554898)
+    wait(1)
+end)
+DIO.AddButton("Weak!",function()
+chat("Weak!")
+Play(4148531112)
+    wait(1)
+end)
+--//------------------------------------------------------------------------------------------\\-- KIRA
+KIRA.AddButton("Killer Queen!",function()
+chat("Killer Queen!")
+Play(2652080817)
+    wait(1)
+end)
+KIRA.AddButton("Third Bomb!",function()
+chat("Third Bomb!")
+Play(2652099910)
+    wait(1)
+end)
+--//------------------------------------------------------------------------------------------\\-- DIEGO
+Diego.AddButton("Time Resumes!",function()
+chat("Time Resumes")
+Play(3084539117)
+    wait(1)
+end)
+Diego.AddButton("WRYYYYYYYYYYYAAAAAAAH!",function()
+chat("WRYYYYYYYYYYYAAAAAAAH!")
+Play(3084528387)
+    wait(1)
+end)
+Diego.AddButton("USHAAAAAAAAAAA!",function()
+chat("USHAAAAAAAAAAA!")
+Play(3084502155)
+    wait(1)
+end)
+Diego.AddButton("Za Warudo! Time Resumes!",function()
+chat("Za Warudo! Time Resumes!")
+Play(3084495179)
+    wait(1)
+end)
+--//------------------------------------------------------------------------------------------\\-- Diavolo
+Diavolo.AddButton("This is king Crimson's ability",function()
+chat("This is king Crimson's ability")
+Play(3373967354)
+    wait(1)
+end)
+Diavolo.AddButton("King Crimson!",function()
+chat("King Crimson!")
+Play(3373956700)
+    wait(1)
+end)
+Diavolo.AddButton("Take This!",function()
+chat("Take This!")
+Play(3373975760)
+    wait(1)
+end)
+Diavolo.AddButton("This Is A Test...",function()
+chat("This Is A Test...")
+Play(3374531743)
+    wait(1)
+end)
+Diavolo.AddButton("You Vile Pukes!",function()
+chat("You Vile Pukes!")
+Play(6120821768)
+    wait(1)
+end)
+Diavolo.AddButton("I, Diavolo. Will be king!",function()
+chat("I, Diavolo. Will be king!")
+Play(5278196952)
+    wait(1)
+end)
+Diavolo.AddButton("A person grows once...",function()
+chat("A person grows once...")
+Play(6665063219)
+    wait(1)
+end)
+Diavolo.AddButton("What you Just saw, What just hit you, was ME!",function()
+chat("What you Just saw, What just hit you, was ME!")
+Play(5258899114)
+    wait(1)
+end)
+--//------------------------------------------------------------------------------------------\\-- EXTRA
+EXTRA.AddLabel("Goku Mode")
+EXTRA.AddButton("Hey! Its Me Goku",function()
+chat("Hey! Its Me Goku")
+Play(5612259294)
+end)
+EXTRA.AddButton("Ultra Instic Theme Song",function()
+chat("...")
+Play(6427919074)
+end)
+EXTRA.AddButton("Kaioken! 10X!",function()
+chat("Kaioken! 10X!")
+Play(1574062497)
+end)
+EXTRA.AddButton("Get Ready, For The Real Deal!",function()
+chat("Get Ready, For The Real Deal!")
+Play(3993574860)
+end)
+EXTRA.AddButton("RAHHHH.. RAHHHHHHHHHHHHHHHH!!",function()
+chat("RAHHHH.. RAHHHHHHHHHHHHHHHH!!")
+Play(2661734130)
+end)
+EXTRA.AddButton("HEEEEEEEEEEEEEEEEEEEEEHHHHHHH AHHH!!!",function()
+chat("HEEEEEEEEEEEEEEEEEEEEEHHHHHHH AHHH!!!")
+Play(2659098182)
+end)
+EXTRA.AddButton("HEEEEEEEEEEEEEEEEEEEEEHHHHHHH AHHH!!!",function()
+chat("HEEEEEEEEEEEEEEEEEEEEEHHHHHHH AHHH!!!")
+Play(2659098182)
+end)
+EXTRA.AddButton("RAHHHHHGGGGHHHHHHHHHHHHHH!!!!",function()
+chat("RAHHHHHGGGGHHHHHHHHHHHHHH!!!!")
+Play(2659098182)
+end)
+EXTRA.AddLabel("Vegeta Mode")
+EXTRA.AddButton("FINAL FLASH!",function()
+chat("FINAL FLASH!")
+Play(950551676)
+end)
+EXTRA.AddLabel("Goku Black Mode")
+EXTRA.AddButton("My Vision For The World Shall Be Realized!",function()
+chat("My Vision For The World Shall Be Realized!")
+Play(966261603)
+end)
+EXTRA.AddButton("You Will Kneel Before Me!",function()
+chat("You Will Kneel Before Me!")
+Play(966268002)
+end)
+EXTRA.AddButton("Feel The Fury Of A God!",function()
+chat("Feel The Fury Of A God!")
+Play(966264954)
+end)
+EXTRA.AddButton("How Dare You, Defy A God!",function()
+chat("How Dare You, Defy A God!")
+Play(966270845)
+end)
+EXTRA.AddButton("The Peaful World Has No Need For Humans, Your Pointless!",function()
+chat("The Peaful World Has No Need For Humans, Your Pointless!")
+Play(966269704)
+end)
+EXTRA.AddButton("Don't You Dare Keep Me Waiting!",function()
+chat("Don't You Dare Keep Me Waiting!")
+Play(966262774)
+end)
+--//------------------------------------------------------------------------------------------\\-- EXTRA
+PUCCI.AddLabel("PUCCI")
+PUCCI.AddButton("Realize Your Insignificance",function()
+chat("Realize Your Insignificance")
+Play(8686937892)
+    wait(1)
+end)
+PUCCI.AddButton("not bad ws",function()
+chat("not bad")
+Play(8686886507)
+    wait(1)
+end)
+PUCCI.AddButton("this is made in heaven",function()
+chat("this is made in heaven!")
+Play(4650379787)
+    wait(1)
+ 
+    MoveTo(math.random(0, 10), 0, 0) wait(0.1)
+    MoveTo(math.random(-10, 0), 0, 0) wait(0.1)
+    MoveTo(0, math.random(0, 10), math.random(0, 10)) wait(0.1)
+    MoveTo(0, 0, math.random(0, 10)) wait(0.1)
+    MoveTo(0, 0, -30) wait(0.1)
+    MoveTo(math.random(0, 10), 0, 0) wait(0.1)
+    MoveTo(math.random(-10, 0), 0, 0) wait(0.1)
+    MoveTo(0, math.random(0, 10), math.random(0, 10)) wait(0.1)
+    MoveTo(0, 0, math.random(0, 10)) wait(0.1)
+    MoveTo(0, 0, -30) wait(0.1)
+    MoveTo(math.random(0, 10), 0, 0) wait(0.1)
+    MoveTo(math.random(-10, 0), 0, 0) wait(0.1)
+    MoveTo(0, math.random(0, 10), math.random(0, 10)) wait(0.1)
+    MoveTo(0, 0, math.random(0, 10)) wait(0.1)
+    MoveTo(0, 0, -30) wait(0.1)
+    MoveTo(math.random(0, 10), 0, 0) wait(0.1)
+    MoveTo(math.random(-10, 0), 0, 0) wait(0.1)
+    MoveTo(0, math.random(0, 10), math.random(0, 10)) wait(0.1)
+    MoveTo(0, 0, math.random(0, 10)) wait(0.1)
+    MoveTo(0, 0, -30) wait(0.1)
+    end)
+PUCCI.AddLabel("pucci is black")
+PUCCI.AddButton("MADE IN HEAVEN BORNED",function()
+chat("made in heaven is born")
+Play(6565056994)
+    wait(1)
+end)
+PUCCI.AddButton("time  acceleration.",function()
+chat("time  aceleration!")
+Play(7204917617)
+    wait(5)
+    Play(8968843545)
+     wait(2)
+      _G.WS = "10";
+local Humanoid = game:GetService("Players").LocalPlayer.Character.Humanoid;
+Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+Humanoid.WalkSpeed = _G.WS;
+end)
+Humanoid.WalkSpeed = _G.WS;
+Play(8968843545)
+     wait(2)
+      _G.WS = "30";
+local Humanoid = game:GetService("Players").LocalPlayer.Character.Humanoid;
+Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+Humanoid.WalkSpeed = _G.WS;
+end)
+Humanoid.WalkSpeed = _G.WS;
+Play(8968843545)
+     wait(2)
+      _G.WS = "70";
+local Humanoid = game:GetService("Players").LocalPlayer.Character.Humanoid;
+Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+Humanoid.WalkSpeed = _G.WS;
+end)
+Humanoid.WalkSpeed = _G.WS;
+Play(8968843545)
+     wait(2)
+      _G.WS = "100";
+local Humanoid = game:GetService("Players").LocalPlayer.Character.Humanoid;
+Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+Humanoid.WalkSpeed = _G.WS;
+end)
+Humanoid.WalkSpeed = _G.WS;
+Play(8968843545)
+     wait(2)
+     _G.WS = "150";
+local Humanoid = game:GetService("Players").LocalPlayer.Character.Humanoid;
+Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+Humanoid.WalkSpeed = _G.WS;
+end)
+Humanoid.WalkSpeed = _G.WS;
+Play(8968843545)
+     wait(2)
+      _G.WS = "200";
+local Humanoid = game:GetService("Players").LocalPlayer.Character.Humanoid;
+Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+Humanoid.WalkSpeed = _G.WS;
+end)
+Humanoid.WalkSpeed = _G.WS;
+Play(8968843545)
+     wait(2)
+      _G.WS = "300";
+local Humanoid = game:GetService("Players").LocalPlayer.Character.Humanoid;
+Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+Humanoid.WalkSpeed = _G.WS;
+end)
+Humanoid.WalkSpeed = _G.WS;
+Play(8968843545)
+     wait(1)
+  _G.WS = "400";
+local Humanoid = game:GetService("Players").LocalPlayer.Character.Humanoid;
+Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+Humanoid.WalkSpeed = _G.WS;
+end)
+Humanoid.WalkSpeed = _G.WS;
+Play(8968843545)
+     wait(1)
+  _G.WS = "500";
+local Humanoid = game:GetService("Players").LocalPlayer.Character.Humanoid;
+Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+Humanoid.WalkSpeed = _G.WS;
+end)
+Humanoid.WalkSpeed = _G.WS;
+Play(8968843545)
+     wait(1)
+  _G.WS = "700";
+local Humanoid = game:GetService("Players").LocalPlayer.Character.Humanoid;
+Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+Humanoid.WalkSpeed = _G.WS;
+end)
+Humanoid.WalkSpeed = _G.WS;
+Play(8968843545)
+     wait(1)
+  _G.WS = "40";
+local Humanoid = game:GetService("Players").LocalPlayer.Character.Humanoid;
+Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+Humanoid.WalkSpeed = _G.WS;
+end)
+Humanoid.WalkSpeed = _G.WS;
+end)
+PUCCI.AddButton("Gravity shift",function()
+chat("Gravity shift !")
+Play(4907091810)
+    wait(1)
+end)
+PUCCI.AddButton("cmoon",function()
+chat("C moon!")
+Play(8258958078)
+  wait(1)
+end)
+PUCCI.AddButton("thats the spot",function()
+chat("thats the spot, i can feel it!")
+Play(9089878503)
+    wait(1)
+end)
+PUCCI.AddButton("This is made in heaven",function()
+chat("This is made in heaven!")
+Play(4650379787)
+    wait(1)
+end)
+PUCCI.AddButton("counter",function()
+chat("1")
+Play(4467794083)
+    wait(1)
+    chat("2")
+    MoveTo(0, 0, -15)
+      wait(1)
+    chat("3")
+    MoveTo(10, 0, -0)
+      wait(1)
+    chat("4")
+    MoveTo(10, 0, -15)
+      wait(1)
+    chat("5")
+    MoveTo(4, 0, -4)
+  wait(1)
+    chat("6")  wait(1)
+    MoveTo(-15, 0, -0)
+    chat("7")  wait(1)
+    MoveTo(0, 0, -15)
+    chat("8")
+      wait(1)
+      MoveTo(-15, 0, -0)
+    chat("9")  wait(1)
+    MoveTo(0, 0, -15)
+    chat("10")  wait(1)
+    MoveTo(4, 0, -4)
+    chat("11")  wait(1)
+    MoveTo(4, 0, -4)
+    MoveTo(0, 0, -15)
+        MoveTo(-15, 0, -0)
+    chat("12")
+    MoveTo(4, 0, -4)
+    MoveTo(0, 0, -15)
+    MoveTo(-15, 0, -0)
+      wait(1)
+    chat("13")  wait(1)
+    MoveTo(4, 0, -4)
+    MoveTo(0, 0, -15)
+    MoveTo(-15, 0, -0)
+    chat("14")  wait(1)
+    MoveTo(4, 0, -4)
+    MoveTo(0, 0, -15)
+    MoveTo(-15, 0, -0)
+    chat("15")MoveTo(4, 0, -4)
+    MoveTo(0, 0, -15)
+    MoveTo(-15, 0, -0)
+      wait(1)
+    chat("16")
+    MoveTo(4, 0, -4)
+    MoveTo(0, 0, -15)
+    MoveTo(-15, 0, -0)
+        end)
+        PUCCI.AddButton("ORA ORA ORA ORA ORA!",function()
+chat("ORA ORA ORA ORA ORA ORA ORA ORAA")
+Play(6678126154)
+    wait(1)
+end)
+PUCCI.AddButton("But For You, I Feel No Pity At All..",function()
+chat("But For You, I Feel No Pity At All..")
+Play(6678126154)
+    wait(1)
+end)
+PUCCI.AddButton("I Held Back..",function()
+chat("I Held Back..")
+Play(5261021079)
+    wait(1)
+end)
+PUCCI.AddButton("Shut up!",function()
+chat("Shut up!")
+Play(8769065286)
+    wait(1)
+end)
+PUCCI.AddButton("Huh!?!?",function()
+chat("Huh!?!?")
+Play(8366720886)
+    wait(1)
+end) 
+--//------------------------------------------------------------------------------------------\\-- Giorno
+GIORNO.AddLabel("voicelines")
+GIORNO.AddButton("I, Giorno Giovanna have a dream.",function()
+chat("I, Giorno Giovanna have a dream.")
+Play(4775356962)
+    wait(1)
+end)
+GIORNO.AddButton("korega requiem da",function()
+chat("korega requiem da...")
+Play(6289721446)
+    wait(1)
+end)
+GIORNO.AddButton("MUDA MUDA MUDA MUDA MUDA",function()
+chat("MUDA MUDA MUDA MUDA MUDA")
+Play(5709299099)
+    wait(1)
+end)
+GIORNO.AddLabel("more summon and voicelines")
+GIORNO.AddButton("Golden Experience Requiem",function()
+chat("Golden Experience Requiem")
+Play(6678131048)
+    wait(1)
+end)
+GIORNO.AddButton("did u really think u would win?",function()
+chat("did u really think u would win?")
+Play(4959226089)
+    wait(1)
+end)
+GIORNO.AddButton("You are insult to life itself",function()
+chat("You are insult to life itself")
+Play(6956084909)
+    wait(1)
+end)
+GIORNO.AddButton("WRYYYYAHHHH",function()
+chat("WRYYYYAHHHH")
+Play(9068304183)
+    wait(1)
+end)
+GIORNO.AddButton("stop pissing me off ",function()
+chat("stop pissing me off")
+Play(6959140302)
+    wait(1)
+end)
+--//------------------------------------------------------------------------------------------\\-- MISC
+MISC.AddButton("JOJO Animation",function()
+    local Animate = game.Players.LocalPlayer.Character.Animate
+     Animate.idle.Animation1.AnimationId = "http://www.roblox.com/asset/?id=1149612882"
+     Animate.idle.Animation2.AnimationId = "http://www.roblox.com/asset/?id=1149612882"
+     Animate.run.RunAnim.AnimationId = "rbxassetid://1150967949"
+     Animate.jump.JumpAnim.AnimationId = "http://www.roblox.com/asset/?id=1148863382"
+     Animate.walk.WalkAnim.AnimationId = "rbxassetid://657552124"
+     Animate.climb.ClimbAnim.AnimationId = "rbxassetid://658360781"
+     Animate.fall.FallAnim.AnimationId = "rbxassetid://1148863382"
+     Animate.swim.Swim.AnimationId = "rbxassetid://657560551"
+     Animate.swimidle.SwimIdle.AnimationId = "rbxassetid://657557095"
+     game.Players.LocalPlayer.Character.Humanoid.Jump = false
+ end)
+ MISC.AddButton("Fly [X]",function()
+ local L_143_ = game.Players.LocalPlayer
+ local L_144_ = L_143_:GetMouse()
+ localplayer = L_143_
+ if workspace:FindFirstChild("Core") then
+ workspace.Core:Destroy()
+ end
+ local L_145_ = Instance.new("Part")
+ L_145_.Name = "Core"
+ L_145_.Size = Vector3.new(0.05, 0.05, 0.05)
+ spawn(function()
+ L_145_.Parent = workspace
+ local L_152_ = Instance.new("Weld", L_145_)
+ L_152_.Part0 = L_145_
+ L_152_.Part1 = localplayer.Character.LowerTorso
+ L_152_.C0 = CFrame.new(0, 0, 0)
+ end)
+ workspace:WaitForChild("Core")
+ local L_146_ = workspace.Core
+ flying = true
+ local L_147_ = 25
+ local L_148_ = {
+ a = false,
+ d = false,
+ w = false,
+ s = false
+ }
+ local L_149_
+ local L_150_
+ local function L_151_func()
+ local L_153_ = Instance.new("BodyPosition", L_146_)
+ local L_154_ = Instance.new("BodyGyro", L_146_)
+ L_153_.Name = "EPIXPOS"
+ L_153_.maxForce = Vector3.new(math.huge, math.huge, math.huge)
+ L_153_.position = L_146_.Position
+ L_154_.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+ L_154_.cframe = L_146_.CFrame
+ repeat
+ wait()
+ localplayer.Character.Humanoid.PlatformStand = true
+ local L_155_ = L_154_.cframe - L_154_.cframe.p + L_153_.position
+ if not L_148_.w and not L_148_.s and not L_148_.a and not L_148_.d then
+ L_147_ = 25
+ end
+ if L_148_.w then
+ L_155_ = L_155_ + workspace.CurrentCamera.CoordinateFrame.lookVector * L_147_
+ L_147_ = L_147_ + 0
+ end
+ if L_148_.s then
+ L_155_ = L_155_ - workspace.CurrentCamera.CoordinateFrame.lookVector * L_147_
+ L_147_ = L_147_ + 0
+ end
+ if L_148_.d then
+ L_155_ = L_155_ * CFrame.new(L_147_, 0, 0)
+ L_147_ = L_147_ + 0
+ end
+ if L_148_.a then
+ L_155_ = L_155_ * CFrame.new(-L_147_, 0, 0)
+ L_147_ = L_147_ + 0
+ end
+ if L_147_ > 10 then
+ L_147_ = 25
+ end
+ L_153_.position = L_155_.p
+ if L_148_.w then
+ L_154_.cframe = workspace.CurrentCamera.CoordinateFrame * CFrame.Angles(-math.rad(L_147_ * 0), 0, 0)
+ elseif L_148_.s then
+ L_154_.cframe = workspace.CurrentCamera.CoordinateFrame * CFrame.Angles(math.rad(L_147_ * 0), 0, 0)
+ else
+ L_154_.cframe = workspace.CurrentCamera.CoordinateFrame
+ end
+ until flying == false
+ if L_154_ then
+ L_154_:Destroy()
+ end
+ if L_153_ then
+ L_153_:Destroy()
+ end
+ flying = false
+ localplayer.Character.Humanoid.PlatformStand = false
+ L_147_ = 25
+ end
+ L_149_ = L_144_.KeyDown:connect(function(L_156_arg0)
+ if not L_146_ or not L_146_.Parent then
+ flying = false
+ L_149_:disconnect()
+ L_150_:disconnect()
+ return
+ end
+ if L_156_arg0 == "w" then
+ L_148_.w = true
+ elseif L_156_arg0 == "s" then
+ L_148_.s = true
+ elseif L_156_arg0 == "a" then
+ L_148_.a = true
+ elseif L_156_arg0 == "d" then
+ L_148_.d = true
+ elseif L_156_arg0 == "x" then
+ if flying == true then
+ flying = false
+ else
+ flying = true
+ L_151_func()
+ end
+ end
+ end)
+ L_150_ = L_144_.KeyUp:connect(function(L_157_arg0)
+ if L_157_arg0 == "w" then
+ L_148_.w = false
+ elseif L_157_arg0 == "s" then
+ L_148_.s = false
+ elseif L_157_arg0 == "a" then
+ L_148_.a = false
+ elseif L_157_arg0 == "d" then
+ L_148_.d = false
+ end
+ end)
+ L_151_func()
+ end)
+CREDIT.AddLabel("sindosu")
